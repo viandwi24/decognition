@@ -77,3 +77,8 @@ app.use(router.allowedMethods());
 // listen
 await app.listen({ port: 8000 });
 ```
+
+## License
+The MIT License (MIT). Please see
+<a href="https://github.com/viandwi24/decognition/blob/master/LICENSE.md">License File</a>
+for more information.
