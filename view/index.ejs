@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decognition Exception Handler - <%= message %></title>
+    <style>
+        .h-half { height: 50%; }
+        .stack-frames-scroll {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .stack-frame-group {
+            border-bottom-width: 1px;
+            border-color: rgb(232, 229, 239);
+            background-color: rgb(255, 255, 255);
+        }
+        @media (min-width: 640px) {
+            .stack-frame {
+                grid-template-columns: 3rem 1fr auto;
+            }
+        }
+        .stack-frame {
+            display: grid;
+            align-items: flex-end;
+            grid-template-columns: 2rem auto auto;
+        }
+        .stack-frame-number {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            color: rgb(121, 0, 245);
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+        .stack-frame-text {
+            display: grid;
+            align-items: center;
+            grid-gap: 0.5rem;
+            border-left-width: 2px;
+            padding-left: 0.75rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-color: rgb(214, 188, 250);
+            color: rgb(75, 71, 109);
+        }
+        .stack-frame-header {
+            margin-right: -2.5rem;
+            width: 100%;
+        }
+        .stack-frame-line {
+            padding-left: 0.5rem;
+            padding-right: 0.25rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            text-align: right;
+            line-height: 1.25;
+        }
+    </style>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-300">
+    <div class="container mx-auto lg:px-12 px-4">
+        <div class="mt-12">
+            <div class="card bg-white border-2 border-gray-400">
+                <div class="card-header p-2 px-8 border-b-2 border-gray-400">
+                    <span class="text-gray-600 text-xs"><%= base_path %></span>
+                </div>
+                <div class="card-body px-16 py-12">
+                    <div class="text-2xl text-gray-500" style="word-wrap: break-word;"><%= name %></div>
+                    <div class="text-3xl font-semibold">
+                        <%= message %>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <a href="<%= url %>" class="text-sm text-gray-700 underline"><%= url %></a>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="mt-10">
+                <div class="tab flex flex-col bg-white border-2 border-gray-400" style="height: 100vh;max-height: 100vh;">
+                    <div class="w-full tab-header">
+                        <div class="w-full bg-indigo-500 flex flex-grow items-center px-8 py-2 justify-center">
+                            <div class="menu">
+                                <div class="menu-center flex flex-grow">
+                                    <a href="#" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600 bg-indigo-700 hover:bg-indigo-700">
+                                        Stack Trace
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-body bg-white h-full">
+                        <div class="tab-item h-full">
+                            <div class="flex w-full lg:flex-row flex-col h-full">
+                                <div class="stack-nav flex lg:w-4/12 w-full lg:h-full h-half relative">
+                                    <ol class="stack-frames-scroll scrollbar text-xs">
+                                        <% for(let i in stack) { %>
+                                            <li>
+                                                <ul class="stack-frame-group">
+                                                    <li class="stack-frame | cursor-pointer stack-frame-selected">
+                                                        <div class="stack-frame-number"><%= stack.length - (parseInt(i)) %></div>
+                                                        <div class="stack-frame-text">
+                                                            <header class="stack-frame-header mb-1">
+                                                                <span class="inline-flex justify-start items-baseline stack-frame-path">
+                                                                    <span class="ui-path text-purple-800">
+                                                                        <div style="word-wrap: break-word;"><%= stack[i].fileName %></div>
+                                                                    </span>
+                                                                </span>
+                                                            </header>
+                                                            <span class="stack-frame-exception-class">
+                                                                <span class="ui-exception-class stack-frame-exception-class">
+                                                                    <span class="opacity-75"><%= stack[i].functionName %></span>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="stack-frame-line">
+                                                            <span class="ui-line-number">
+                                                                <%= stack[i].line %> :
+                                                                <span class="font-mono"><%= stack[i].column %></span>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        <% } %>                                        
+                                    </ol>
+                                </div>
+                                <div class="stack-main lg:w-8/12 bg-gray-100 lg:h-full h-half">
+                                    <div id="tab-1">
+                                        <div class="flex w-full h-full" style="flex-direction: column;">
+                                            <div class="flex-1 w-full p-4">
+                                                <div class="text-sm text-gray-700 opacity-75"><%= stack[0].functionName %></div>
+                                                <div class="text-sm text-indigo-700">
+                                                    <%= stack[0].fileName %>
+                                                    :<span class="font-mono"><%= stack[0].lineNumber %></span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 w-full">
+                                                <pre>
+                                                    <code
+                                                      style="height:100%;"
+                                                      data-ln-start-from="<%= stack[0].preview.startLine %>"
+                                                      class="javascript"><%= stack[0].preview.file %></code>
+                                                </pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/TRSasasusu/highlightjs-highlight-lines.js@1.1.6/highlightjs-highlight-lines.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        hljs.initLineNumbersOnLoad();
+        hljs.initHighlightLinesOnLoad([
+            [{start: <%= (stack[0].lineNumber-stack[0].preview.startLine) %>, end: <%= (stack[0].lineNumber-stack[0].preview.startLine) %>, color: 'rgb(180, 178, 192)'},]
+        ]);
+    </script>    
+</body>
+</html>
