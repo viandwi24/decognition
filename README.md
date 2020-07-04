@@ -22,10 +22,18 @@ Import Decongnition :
 ```
 import { Decognition } from "https://raw.githubusercontent.com/viandwi24/decognition/master/mod.ts";
 ```
+Try-catch :
+```
+try {
+    //
+} catch (error) {
+    throw new Decognition(error).render();
+}
+```
 Render :
 ```
 console.log(
-    new Decognition("undefined variable a").render()
+    new Decognition("undefined variable a").render();
 );
 ```
 Render to HTML :
