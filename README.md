@@ -8,6 +8,7 @@ a Pretty Exception Handler for TypeScript Deno. Inspirated from Laravel & Flare 
 ## Features
 * Pretty Exception on console
 * Support Exception Render to HTML
+* Make Custom Exception
 
 ## To Do list
 - [x] Pretty Console Output
@@ -40,6 +41,15 @@ Render to HTML :
 ```
 let exeption = new Decognition("undefined variable a");
 console.log(await exeption.renderHtml());
+```
+Make Custom Exception :
+```
+export class NotFoundException extends Decognition {
+    constructor(error: string) {
+        super(error);
+        this.message = "[NotFound] " + this.message;
+    }
+}
 ```
 
 ## Example

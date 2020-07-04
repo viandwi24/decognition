@@ -1,5 +1,9 @@
 import { Decognition } from "../mod.ts";
 
-console.log(
-    new Decognition("undefined variable a").render()
-);
+function testFunction() {
+    console.log(
+        new Decognition("undefined variable a").render()
+    );
+}
+
+testFunction();

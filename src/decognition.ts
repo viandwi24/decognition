@@ -56,7 +56,7 @@ export class Decognition extends Error {
      * @returns string
      */
     public getName(): string {
-        return "\\" + this.name;
+        return "\\" + this.name; 
     }
 
     
@@ -68,7 +68,7 @@ export class Decognition extends Error {
         return this.message
             .replace(/at.*/g, "")
             .replaceAll("  ", "")
-            .replace("\n", "");
+            .replaceAll("\n", "");
     }
 
     /**
@@ -228,7 +228,7 @@ export class Decognition extends Error {
         // fix message
         params.message = this.clearAnsiColor(params.message);
         
-        return await Dejs.renderFileToString("../view/index.ejs", params);
+        return await Dejs.renderFileToString("../src/view/index.ejs", params);
     }
 
     private clearAnsiColor(val: string) {
@@ -240,9 +240,10 @@ export class Decognition extends Error {
      * @returns string
      */
     public render(): string {
+        let name = this.getName().replaceAll("\\", " \\ ");
         let stack: Array<IStack> = this.getStack();
         let file: string = this.getFile();
-        let result = `\n\n\t${clc.bgRed.text(this.getName())}${clc.reset.text("")}`;
+        let result = `\n\n\t${clc.bgRed.text(name)}${clc.reset.text("")}`;
 
         // title
         result += `\n\n\t${this.getMessage()}`;
@@ -266,7 +267,7 @@ export class Decognition extends Error {
                     + `${(index < 1000 && index > 100 ? "0" : "")}`
                     + `${(index < 10000 && index > 1000 ? "0" : "")}`
                     + `${index+1}`
-                    + `|\t${value}`;
+                    + `|    ${value}`;
 
                 result += (parseInt(i)+2 == this.getLine())
                     ? `${clc.bgRed.text(lineres)}${clc.reset.text("")}\n`
@@ -291,13 +292,21 @@ export class Decognition extends Error {
     }
 
     protected parseError() {
+        // name
+        this.name = (this.constructor.name != "Decognition") ? this.constructor.name : this.name;
+
+        // 
         let regTypeError  = new RegExp(/TypeError:/g);
         if (regTypeError.test(this.message)) {
             let msg = this.message.split("[ERROR]"); msg.splice(1, Infinity);
+            let message = this.message.replace(msg.join(), "");
+            let  name = this.clearAnsiColor(msg.join().replace(": ", "\\"));
             if (this.name == "Error") {
-                this.message = this.message.replace(msg.join(), "");
-                this.name = this.clearAnsiColor(msg.join().replace(": ", "\\"));
+                this.name = name;
+            } else {
+                this.name = `${this.name}\\${name}`;
             }
+            this.message = message;
         }
 
         // 

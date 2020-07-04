@@ -46,6 +46,8 @@ app.use(async (ctx, next) => {
             ctx.response.body = await decognition.renderHtml({
                 url: "http://localhost:8000"
             });
+
+            ctx.response.status = 500;
         }
     }
 });

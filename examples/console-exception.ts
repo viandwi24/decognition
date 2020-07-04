@@ -1,9 +1,10 @@
+import { NotFoundException } from "./custom-exception.ts";
 import { Decognition } from "../mod.ts";
 
 try {
     const a = await require(`${Deno.cwd()}/tes.ts`);
 } catch (error) {
-    throw new Decognition(error).render();
+    throw new NotFoundException(error).render();
 }
 
 async function require(path: string)
