@@ -9,12 +9,12 @@ a Pretty Exception Handler for TypeScript Deno.
 * Support Exception Render to HTML
 
 ## To Do list
-[x] Pretty Console Output
-[x] Pretty HTML Output
-[ ] Custom Handler
-[ ] Solution
-[ ] Runnable Solution
-[ ] Logging
+- [x] Pretty Console Output
+- [x] Pretty HTML Output
+- [ ] Custom Handler
+- [ ] Solution
+- [ ] Runnable Solution
+- [ ] Logging
 
 ## How Work
 Import Decongnition :
