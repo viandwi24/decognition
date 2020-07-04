@@ -5,17 +5,25 @@ import { Decognition } from "../mod.ts";
 const router = new Router();
 const app = new Application();
 
+
 // simple route
 router.get("/", async (context) => {
     const a = await require(`${Deno.cwd()}/tes.ts`);
     context.response.body = "Hello world!";
 });
-
-// function
 async function require(path: string)
 {
     return await import(path);
 }
+
+
+// listenner
+app.addEventListener("listen", ({ hostname, port, secure }) => {
+    console.log(
+        `Listening on: ${secure ? "https://" : "http://"}${hostname ?? "localhost"}:${port}`
+    );
+});
+
 
 // middlewre
 app.use(async (ctx, next) => {
