@@ -298,15 +298,19 @@ export class Decognition extends Error {
         // 
         let regTypeError  = new RegExp(/TypeError:/g);
         if (regTypeError.test(this.message)) {
-            let msg = this.message.split("[ERROR]"); msg.splice(1, Infinity);
-            let message = this.message.replace(msg.join(), "");
-            let  name = this.clearAnsiColor(msg.join().replace(": ", "\\"));
-            if (this.name == "Error") {
-                this.name = name;
-            } else {
-                this.name = `${this.name}\\${name}`;
+            let regError  = new RegExp(/\[ERROR\]:/g);
+            if (regError.test(this.message)) {
+                let msg = this.message.split("[ERROR]"); msg.splice(1, Infinity);
+                let message = this.message.replace(msg.join(), "");
+                let  name = this.clearAnsiColor(msg.join().replace(": ", "\\"));
+                if (this.name == "Error") {
+                    this.name = name;
+                    this.message = message;
+                } else {
+                    this.name = `${this.name}\\${name}`;
+                    this.message = message;
+                }
             }
-            this.message = message;
         }
 
         // 
