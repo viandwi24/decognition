@@ -45,7 +45,13 @@ export interface IParamsRenderHtml {
 export class Decognition extends Error {
     private getStackCache: Array<IStack> = [];
 
-    constructor(protected error: string) {
+    
+    /**
+     * Constructor
+     * @param  {string} error error message or Error instance
+     * @param  {Object={}} vars variable to dump
+     */
+    constructor(protected error: string, protected vars: object = {}) {
         super(error);
         this.parseError();
     }
@@ -216,7 +222,8 @@ export class Decognition extends Error {
 
     /**
      * Render html output
-     * @returns string
+     * @param  {IOptionsRenderHtml} options?
+     * @returns Promise
      */
     public async renderHtml(options?: IOptionsRenderHtml): Promise<string> {
         let params: IParamsRenderHtml = {
@@ -247,6 +254,12 @@ export class Decognition extends Error {
 
         // title
         result += `\n\n\t${this.getMessage()}`;
+
+        // dump variable
+        if (Object.keys(this.vars).length !== 0) {
+            result += `\n\n\t${clc.bgGreen.text(" Dump ")}${clc.reset.text("")}`;
+            result += `\n\t${this.syntaxHighlight(this.vars)}`;
+        }
 
         // file
         result += `\n\n\tat ${clc.green.text(this.getFileName())}:${this.getLine()}${clc.reset.text("")}\n`;
@@ -291,6 +304,9 @@ export class Decognition extends Error {
         return result;
     }
 
+    /**
+     * parse error
+     */
     protected parseError() {
         // name
         this.name = (this.constructor.name != "Decognition") ? this.constructor.name : this.name;
@@ -320,8 +336,45 @@ export class Decognition extends Error {
         }
     }
 
+    /**
+     * readFile
+     * 
+     * @param {string} file 
+     * @param {type} type?
+     */
     protected readFile (file: string, type?: string) {
         const types = type || 'utf-8';
         return new TextDecoder(types).decode(Deno.readFileSync(file));
+    }
+    
+    protected syntaxHighlight(json: any) {
+        if (typeof json != 'string') {
+             json = JSON.stringify(json, undefined, 2);
+        }
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        let result = json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match: any) {
+            let cls;
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                    match = `${clc.green.text(match)}${clc.reset.text("")}`;
+                } else {
+                    cls = 'string';
+                    match = `${clc.blue.text(match)}${clc.reset.text("")}`;
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+                match = `${clc.red.text(match)}${clc.reset.text("")}`;
+            } else if (/null/.test(match)) {
+                cls = 'null';
+                match = `${clc.white.text(match)}${clc.reset.text("")}`;
+            } else {
+                cls = 'number';
+                match = `${clc.yellow.text(match)}${clc.reset.text("")}`;
+            }
+            return match;
+        });
+
+        return result.replaceAll("\n", "\n\t");
     }
 }
