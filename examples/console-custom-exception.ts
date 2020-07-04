@@ -2,4 +2,5 @@ import { NotFoundException } from "./custom-exception.ts";
 import { BError } from "https://deno.land/x/berror/berror.ts";
 import { Decognition } from "../mod.ts";
 
-throw new Decognition("Your name must 3 word.", { name: "Alfian Dwi" }).render();
+let params = { name: "Alfian Dwi Nugraha", active: true };
+console.log((new Decognition("Name must be at least 10 characters.", params)).render());

@@ -37,7 +37,7 @@ console.log(
     new Decognition("undefined variable a").render();
 );
 ```
-Render to HTML :
+Render to HTML : (render html with Dejs library, so return promise)
 ```
 let exeption = new Decognition("undefined variable a");
 console.log(await exeption.renderHtml());
@@ -50,6 +50,11 @@ export class NotFoundException extends Decognition {
         this.message = "[NotFound] " + this.message;
     }
 }
+```
+With Dump variable :
+```
+let params = { name: "Alfian Dwi Nugraha", active: true };
+(new Decognition("Name must be at least 10 characters.", params)).render();
 ```
 
 ## Example
