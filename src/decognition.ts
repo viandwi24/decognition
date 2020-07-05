@@ -123,7 +123,7 @@ export class Decognition extends Error {
 
                     // make preview file
                     let file_arr: Array<string> = file.split("\n");
-                    let line = this.getLine();
+                    let line = lineNumber;
                     let digit: any = file_arr.length.toString().split("").pop();
                     let digit_number = ""; for(let i in digit) digit_number += "0";
                     let gap = 10;
