@@ -157,8 +157,8 @@
                                                         </div>
                                                         <div class="stack-frame-line">
                                                             <span class="ui-line-number">
-                                                                <%= stack[i].line %> :
-                                                                <span class="font-mono"><%= stack[i].column %></span>
+                                                                <%= stack[i].lineNumber %> :
+                                                                <span class="font-mono"><%= stack[i].columnNumber %></span>
                                                             </span>
                                                         </div>
                                                     </li>
@@ -213,6 +213,8 @@
 
                 frame_old.forEach((val) => { val.classList.remove("bg-indigo-200") });
                 frame.classList.add("bg-indigo-200");
+                
+                Prism.highlightAll();
             });
         });
     </script>
