@@ -1,7 +1,7 @@
 import { Decognition } from "../mod.ts";
 export class NotFoundException extends Decognition {
-    constructor(error: string, vars: object) {
-        super(error, vars);
+    constructor(error: string) {
+        super(error);
         this.message = "[NotFound] " + this.message;
     }
 }
