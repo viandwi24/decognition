@@ -1,5 +1,6 @@
 // Copyright 2020 the Decognition authors. All rights reserved. MIT license.
 import { Dejs, clc } from "../deps.ts";
+import { index as Template } from "./view/index.ts";
 
 export interface IFilePreview {
     file: string;
@@ -235,7 +236,7 @@ export class Decognition extends Error {
         // fix message
         params.message = this.clearAnsiColor(params.message);
         
-        return await Dejs.renderFileToString("../src/view/index.ejs", params);
+        return await Dejs.renderToString(Template, params);
     }
 
     private clearAnsiColor(val: string) {

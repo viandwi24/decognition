@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+export const index = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -217,4 +217,4 @@
         });
     </script>
 </body>
-</html>
+</html>`;
