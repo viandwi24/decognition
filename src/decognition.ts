@@ -74,7 +74,7 @@ export class Decognition extends Error {
      */
     public getMessage(): string {
         return this.message
-            .replace(/at.*/g, "")
+            .replace(/.at/g, "")
             .replaceAll("  ", "")
             .replaceAll("\n", "");
     }
