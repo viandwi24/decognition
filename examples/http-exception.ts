@@ -7,14 +7,32 @@ const app = new Application();
 
 
 // simple route
-router.get("/", async (context) => {
-    const a = await require(`${Deno.cwd()}/tes.ts`);
-    context.response.body = "Hello world!";
+router.get("/", async (ctx) => {
+    let user = {
+        name: "Alfian Dwi Nugraha",
+        address: "Indonesian, East Java, Mojokerto, Sooko, Kedung Maling",
+        age: 18
+    };
+
+
+    // success
+    ctx.response.body = `Hello ${user.name}!`;
+    ctx.response.status = 200;
+
+    // exception
+    try {
+        if (user.age < 20) throw "You are under 20 years old";
+    } catch (err) {
+        let exception = new Decognition(err, user);
+        
+        // output to console
+        console.log(exception.render());
+
+        // output to html
+        ctx.response.body = await exception.renderHtml();
+        ctx.response.status = 500;
+    }
 });
-async function require(path: string)
-{
-    return await import(path);
-}
 
 
 // listenner
@@ -46,7 +64,6 @@ app.use(async (ctx, next) => {
             ctx.response.body = await decognition.renderHtml({
                 url: "http://localhost:8000"
             });
-
             ctx.response.status = 500;
         }
     }

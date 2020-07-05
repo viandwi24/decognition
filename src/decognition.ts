@@ -41,6 +41,7 @@ export interface IParamsRenderHtml {
     column: number;
     url?: string;
     base_path?: string;
+    vars?: object;
 }
 
 export class Decognition extends Error {
@@ -230,10 +231,11 @@ export class Decognition extends Error {
         let params: IParamsRenderHtml = {
             ...this.getAll(),
             base_path: (options?.base_path)  ? options?.base_path : `${Deno.cwd()}`,
-            url: (options?.url) ? options.url : "http://localhost"
+            url: (options?.url) ? options.url : "http://localhost",
+            vars: this.vars,
         };
 
-        // fix message
+        // modify
         params.message = this.clearAnsiColor(params.message);
         
         return await Dejs.renderToString(Template, params);

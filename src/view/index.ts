@@ -91,8 +91,8 @@ export const index = `<!DOCTYPE html>
             min-height: 0;
             overflow-y: scroll;
         }
-        .preview-stack { display: none; }
-        .preview-stack.active { display: block; }
+        .preview-stack, .tab-item { display: none; }
+        .preview-stack.active, .tab-item.active { display: block; }
     </style>
 </head>
 <body class="bg-gray-300">
@@ -121,10 +121,10 @@ export const index = `<!DOCTYPE html>
                         <div class="w-full bg-indigo-500 flex flex-grow items-center px-8 py-2 justify-center">
                             <div class="menu">
                                 <div class="menu-center flex flex-grow">
-                                    <a href="#" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600 bg-indigo-700 hover:bg-indigo-700">
+                                    <a href="#" data-tab="tab-stack-trace" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600 bg-indigo-700 hover:bg-indigo-700">
                                         Stack Trace
                                     </a>
-                                    <a href="#" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600">
+                                    <a href="#" data-tab="tab-dump" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600">
                                         Dump
                                     </a>
                                 </div>
@@ -132,7 +132,7 @@ export const index = `<!DOCTYPE html>
                         </div>
                     </div>
                     <div class="tab-body bg-white h-full">
-                        <div class="tab-item h-full">
+                        <div class="tab-item h-full active" id="tab-stack-trace">
                             <div class="flex w-full lg:flex-row flex-col h-full">
                                 <div class="stack-nav flex lg:w-4/12 w-full lg:h-full h-half relative">
                                     <ol class="stack-frames-scroll scrollbar text-xs">
@@ -191,12 +191,16 @@ export const index = `<!DOCTYPE html>
                                 </div>
                             </div>
                         </div>
+                        <div class="tab-item h-full" id="tab-dump">
+                            <pre style="margin: 0;"><code class="language-json"><%= JSON.stringify(vars, undefined, 2) %></code></pre>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/components/prism-json.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.20.0/plugins/line-highlight/prism-line-highlight.min.js"></script>
     <script>
@@ -215,6 +219,22 @@ export const index = `<!DOCTYPE html>
                 frame.classList.add("bg-indigo-200");
                 
                 Prism.highlightAll();
+            });
+        });
+        document.querySelectorAll(".menu a").forEach((val) => {
+            val.addEventListener("click", function (e) {
+                e.preventDefault();
+                let select_tab = this.dataset.tab;
+                let tab = this;
+                let tab_items = document.querySelectorAll(".menu a");
+                let contents = document.querySelectorAll(".tab-item");
+                let content = document.querySelector("#"+select_tab);
+
+                tab_items.forEach((val) => { val.classList.remove("bg-indigo-700", "hover:bg-indigo-700"); });
+                tab.classList.add("bg-indigo-700", "hover:bg-indigo-700");
+
+                contents.forEach((val) => { val.classList.remove("active"); });
+                content.classList.add("active");
             });
         });
     </script>
