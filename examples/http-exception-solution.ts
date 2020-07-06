@@ -1,5 +1,37 @@
 import { Application, Router, isHttpError, Status } from "https://deno.land/x/oak/mod.ts";
-import { Decognition } from "../mod.ts";
+import {
+    Decognition, 
+    Solution, ProvidesSolution, 
+    Tab, withCustomTab, 
+    IParamsRenderHtml,
+} from "../mod.ts";
+
+// make custom exception with solution
+class MyException
+    extends Decognition 
+    implements ProvidesSolution, withCustomTab {
+
+    constructor(error: string, vars: Record<string,unknown>) {
+        super(error, vars);
+    }
+    
+    public getSolution(): Solution {
+        return (new Solution)
+            .setTitle("My Solution Title")
+            .setDescription("this is my solution description.")
+            .setDocumentation({
+                "My Docs": "http://google.com",
+                "My Docs 2": "http://google.com",
+            });
+    }
+
+    public getTab(): Tab {
+        return (new Tab)
+            .create("mycustomtab", "My Custom Tab", function (params: IParamsRenderHtml) {
+                return `<h1>h3h3h3</h1>`;
+            });
+    }
+}
 
 // isntance
 const router = new Router();
@@ -23,7 +55,7 @@ router.get("/", async (ctx) => {
     try {
         throw "Name must be at least 10 characters.";
     } catch (err) {
-        let exception = new Decognition(err, user);
+        let exception = new MyException(err, user);
         
         // output to console
         console.log(exception.render());

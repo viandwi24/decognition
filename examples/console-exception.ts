@@ -1,5 +1,4 @@
 import { NotFoundException } from "./custom-exception.ts";
-import { Decognition } from "../mod.ts";
 
 try {
     const a = await require(`${Deno.cwd()}/tes.ts`);
