@@ -1,6 +1,8 @@
 // Copyright 2020 the Decognition authors. All rights reserved. MIT license.
 import { Dejs, clc } from "../deps.ts";
 import { index as Template } from "./view/index.ts";
+import { Solution } from "./solution.ts";
+import { Tab } from "./tab.ts";
 
 export interface IFilePreview {
     file: string;
@@ -26,6 +28,7 @@ export interface IParseError {
     column: number;
     file: string;
     fileName: string;
+    vars: Record<string,unknown>;
 }
 
 export interface IOptionsRenderHtml {
@@ -41,7 +44,11 @@ export interface IParamsRenderHtml {
     column: number;
     url?: string;
     base_path?: string;
-    vars?: object;
+    vars?: Record<string,unknown>;
+    solution?: Solution;
+    tab?: Tab;
+    tab_header_render?: string;
+    tab_content_render?: string;
 }
 
 export class Decognition extends Error {
@@ -53,7 +60,7 @@ export class Decognition extends Error {
      * @param  {string} error error message or Error instance
      * @param  {Object={}} vars variable to dump
      */
-    constructor(protected error: string, protected vars: object = {}) {
+    constructor(protected error: string, protected vars: Record<string,unknown> = {}) {
         super(error);
         this.parseError();
     }
@@ -204,6 +211,14 @@ export class Decognition extends Error {
         if (stack.length > 0) return stack[0].file;
         return "";
     }
+    
+    /**
+     * Get vars to dump
+     * @returns string
+     */
+    public getVars(): Record<string,unknown> {
+        return this.vars;
+    }
 
     
     /**
@@ -218,7 +233,8 @@ export class Decognition extends Error {
             line: this.getLine(),
             file: this.getFile(),
             fileName: this.getFileName(),
-            column: this.getColumn()
+            column: this.getColumn(),
+            vars: this.getVars()
         };
     }
 
@@ -237,12 +253,23 @@ export class Decognition extends Error {
 
         // modify
         params.message = this.clearAnsiColor(params.message);
-        
-        return await Dejs.renderToString(Template, params);
-    }
 
-    private clearAnsiColor(val: string) {
-        return val.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+        // solution
+        let solution = this.getSolution();
+        if (solution != null && solution instanceof Solution) params.solution = solution;
+
+        // custom tab
+        let tab = this.getTab();
+        if (tab != null && tab instanceof Tab) {
+            params.tab = tab;
+            let customTab: Tab = tab;
+            params.tab_header_render = tab.renderHeader();
+            params.tab_content_render = tab.renderContent(params);
+        }
+        
+        // render
+        return await Dejs.renderToString(Template, params);
+        // return await Dejs.renderFileToString("../src/view/index.ejs", params);
     }
 
     /**
@@ -260,12 +287,20 @@ export class Decognition extends Error {
 
         // dump variable
         if (Object.keys(this.vars).length !== 0) {
-            result += `\n\n\t${clc.bgGreen.text(" Dump ")}${clc.reset.text("")}`;
-            result += `\n\t${this.syntaxHighlight(this.vars)}`;
+            result += `\n\n\n\t${clc.bgGreen.text(" Dump ")}${clc.reset.text("")}`;
+            result += `\n\t${this.consoleJsonHighlight(this.vars)}`;
+        }
+
+        // solution
+        let solution = this.getSolution();
+        if (solution != null && solution instanceof Solution) {
+            result += `\n\n\n\t${clc.bgGreen.text(" Solution ")}${clc.reset.text("")}`;
+            result += `\n\n\t${clc.underscore.text(clc.bright.text(solution.getTitle()))}${clc.reset.text("")}`;
+            result += `\n\n\t${solution.getDescription()}`;
         }
 
         // file
-        result += `\n\n\tat ${clc.green.text(this.getFileName())}:${this.getLine()}${clc.reset.text("")}\n`;
+        result += `\n\n\n\tat ${clc.green.text(this.getFileName())}:${this.getLine()}${clc.reset.text("")}\n`;
         if (file != "") {
             let file_arr: Array<string> = file.split("\n");
             let line = this.getLine();
@@ -307,6 +342,7 @@ export class Decognition extends Error {
         return result;
     }
 
+
     /**
      * parse error
      */
@@ -333,15 +369,20 @@ export class Decognition extends Error {
         }
 
         // 
-        let regError  = new RegExp(/\[ERROR\]:/g);
-        if (regError.test(this.message)) {
+        let regERROR  = new RegExp(/\[ERROR\]:/g);
+        if (regERROR.test(this.message)) {
             this.message = this.message.replace("[ERROR]: ", "");
+        }
+
+        // 
+        let regError  = new RegExp(/Error:/g);
+        if (regError.test(this.message)) {
+            this.message = this.message.replace("Error: ", "");
         }
     }
 
     /**
      * readFile
-     * 
      * @param {string} file 
      * @param {type} type?
      */
@@ -350,7 +391,11 @@ export class Decognition extends Error {
         return new TextDecoder(types).decode(Deno.readFileSync(file));
     }
     
-    protected syntaxHighlight(json: any) {
+    /**
+     * Syntax highlgiht for json console output
+     * @param  {any} json
+     */
+    protected consoleJsonHighlight(json: any) {
         if (typeof json != 'string') {
              json = JSON.stringify(json, undefined, 2);
         }
@@ -379,5 +424,30 @@ export class Decognition extends Error {
         });
 
         return result.replaceAll("\n", "\n\t");
+    }
+
+    /**
+     * Clear ansi color
+     * @param  {string} val
+     */
+    private clearAnsiColor(val: string) {
+        return val.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+    }
+
+
+    /**
+     * Get solution
+     * @returns Solution|null
+     */
+    public getSolution(): Solution|null {
+        return null;
+    }
+
+    /**
+     * Get tab
+     * @returns Tab|null
+     */
+    public getTab(): Tab|null {
+        return null;
     }
 }

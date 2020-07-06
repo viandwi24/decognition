@@ -111,8 +111,27 @@
                     <div class="mt-6">
                         <a href="<%= url %>" class="text-sm text-gray-700 underline"><%= url %></a>
                     </div>
-                    
                 </div>
+
+                <% if (typeof solution != "undefined") { %>
+                    <div class="card-body bg-green-400 px-16 py-12">
+                        <div class="text-2xl font-semibold text-gray-900">
+                            <%= solution.getTitle() %>
+                        </div>
+                        <div class="text-xl text-gray-800">
+                            <%= solution.getDescription() %>
+                        </div>
+
+                        <% if (solution.getDocumentation().length !== 0) { %>
+                            <div class="mt-6">
+                                <span class="text-gray-800">READ MORE :</span>
+                                <% for (let i in solution.getDocumentation()) { %> 
+                                    <a href="<%= solution.getDocumentation()[i].link %>" class="text-gray-700 underline"><%= solution.getDocumentation()[i].text %></a>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                <% } %>
             </div>
 
             <div class="mt-10">
@@ -124,6 +143,7 @@
                                     <a href="#" data-tab="tab-stack-trace" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600 bg-indigo-700 hover:bg-indigo-700">
                                         Stack Trace
                                     </a>
+                                    <%- (typeof tab_header_render != "undefined") ? tab_header_render : "" %>
                                     <a href="#" data-tab="tab-dump" class="flex py-2 px-4 mx-1 text-gray-300 hover:bg-indigo-600">
                                         Dump
                                     </a>
@@ -191,6 +211,7 @@
                                 </div>
                             </div>
                         </div>
+                        <%- (typeof tab_content_render != "undefined") ? tab_content_render : "" %>
                         <div class="tab-item h-full" id="tab-dump">
                             <pre style="margin: 0;"><code class="language-json"><%= JSON.stringify(vars, undefined, 2) %></code></pre>
                         </div>
