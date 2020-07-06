@@ -45,13 +45,14 @@ export class Tab {
         return result;
     }
 
-    public renderContent(params: IParamsRenderHtml): string {
+    public async renderContent(params: IParamsRenderHtml): Promise<string> {
         let result: string = "";
         for (let i in this.tabs) {
             let item: ITab = this.tabs[i];
+            let content = await (item.render(params));
             result += `
             <div class="tab-item h-full" id="tab-${item.key}">
-                ${(item.render(params))}
+                ${content}
             </div>`;
         }
         return result;

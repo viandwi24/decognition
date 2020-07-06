@@ -27,7 +27,7 @@ class MyException
 
     public getTab(): Tab {
         return (new Tab)
-            .create("mycustomtab", "My Custom Tab", function (params: IParamsRenderHtml) {
+            .create("mycustomtab", "My Custom Tab", async function (params: IParamsRenderHtml) {
                 return `<h1>h3h3h3</h1>`;
             });
     }

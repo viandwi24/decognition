@@ -262,9 +262,8 @@ export class Decognition extends Error {
         let tab = this.getTab();
         if (tab != null && tab instanceof Tab) {
             params.tab = tab;
-            let customTab: Tab = tab;
             params.tab_header_render = tab.renderHeader();
-            params.tab_content_render = tab.renderContent(params);
+            params.tab_content_render = await tab.renderContent(params);
         }
         
         // render
