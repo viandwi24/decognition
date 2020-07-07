@@ -9,53 +9,113 @@ a Pretty Exception Handler for TypeScript Deno. Inspirated from Laravel & Flare 
 * Pretty Exception on console
 * Support Exception Render to HTML
 * Make Custom Exception
+* Exception with dump a data
 
 ## To Do list
 - [x] Pretty Console Output
 - [x] Pretty HTML Output
-- [ ] Custom Handler
-- [ ] Solution
+- [x] Custom Handler
+- [x] Solution
+- [x] Custom Tab
 - [ ] Runnable Solution
 - [ ] Logging
 
-## How Work
-Import Decongnition :
+
+## Use Decognition
+### Decognition Library
 ```
-import { Decognition } from "https://raw.githubusercontent.com/viandwi24/decognition/master/mod.ts";
+import { Decognition } from "https://deno.land/x/decognition/mod.ts";
 ```
-Try-catch :
+### with Console
+```
+console.log( new Decognition("a error message").render() );
+```
+### Throw
+```
+throw new Decognition("a error message").render();
+```
+### Try - Catch
 ```
 try {
-    //
+    // throw error
+    throw "error";
+
+    // or script another error
+    ...
 } catch (error) {
     throw new Decognition(error).render();
 }
 ```
-Render :
+### Html Render
 ```
-console.log(
-    new Decognition("undefined variable a").render();
-);
+let e = new Decognition("a error message");
+let html = await e.renderHtml();
+return html;
 ```
-Render to HTML : (render html with Dejs library, so return promise)
+### Dump Variable
 ```
-let exeption = new Decognition("undefined variable a");
-console.log(await exeption.renderHtml());
+let e = new Decognition("Your user data not valid.", { name: "Alfian", age: 17 });
 ```
-Make Custom Exception :
+### Custom Exception
 ```
-export class NotFoundException extends Decognition {
-    constructor(error: string) {
-        super(error);
-        this.message = "[NotFound] " + this.message;
+class MyException extends Decognition  {
+    constructor(error: string, vars: Record<string,unknown>) {
+        super(error, vars);
+        this.name = "My Exception";
     }
 }
 ```
-With Dump variable :
+### Make Solution
 ```
-let params = { name: "Alfian Dwi Nugraha", active: true };
-(new Decognition("Name must be at least 10 characters.", params)).render();
+import {
+    Decognition, 
+    Solution, ProvidesSolution, 
+} "https://deno.land/x/decognition/mod.ts";
+
+class MyException
+    extends Decognition 
+    implements ProvidesSolution {
+
+    constructor(error: string, vars: Record<string,unknown>) {
+        super(error, vars);
+    }
+    
+    public getSolution(): Solution {
+        return (new Solution)
+            .setTitle("My Solution Title")
+            .setDescription("this is my solution description.")
+            .setDocumentation({
+                "My Docs": "http://google.com",
+                "My Docs 2": "http://google.com",
+            });
+    }
+}
 ```
+### Html Custom Tab
+```
+import {
+    Decognition,
+    Tab, withCustomTab, 
+    IParamsRenderHtml,
+} "https://deno.land/x/decognition/mod.ts";
+
+class MyException
+    extends Decognition 
+    implements withCustomTab {
+
+    constructor(error: string, vars: Record<string,unknown>) {
+        super(error, vars);
+    }
+
+    public getTab(): Tab {
+        return (new Tab)
+            .create("mycustomtab", "My Custom Tab", async function (params: IParamsRenderHtml) {
+                return `<h2 class="font-bold text-2xl">Content Custom Tab!</h2>`;
+            });
+    }
+}
+```
+
 
 ## Example
 ### with Oak Framework
