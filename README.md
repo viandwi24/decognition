@@ -1,6 +1,7 @@
 # Decognition
 a Pretty Exception Handler for TypeScript Deno. Inspirated from Laravel & Flare Ignition.  
 *This library is still under development.* Please wait and send your help!.
+| v0.2
 
 ![screenshot preview](https://raw.githubusercontent.com/viandwi24/decognition/master/screenshot/ss.png)
 ![screenshot preview](https://raw.githubusercontent.com/viandwi24/decognition/master/screenshot/ss2.png)
